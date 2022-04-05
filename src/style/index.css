@@ -1,0 +1,13 @@
+* {
+    box-sizing: border-box;
+    /* border: 1px dotted grey; */
+}
+
+body {
+    
+    background-color: burlywood;
+    display: flex;
+        justify-content: center;
+        align-items: center;
+    flex-direction: column;
+}
