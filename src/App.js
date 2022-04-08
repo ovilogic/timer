@@ -1,47 +1,46 @@
 
-
 import { useEffect, useState } from 'react';
 import './style/app.css'
 
 
 function App() {
 
-  const [total, setTotal] = useState(0)
+  
   const [main, setMain] = useState('0')
   const [plus, setPlus] = useState(false)
   const [minus, setMinus] = useState(false)
   const [times, setTimes] = useState(false)
   const [divide,setDivide] = useState(false)
   const [display, setDisplay] = useState('')
-  const [subTotal, setSubTotal] = useState(0)
-  const [result, setResult] = useState(0)
  
-
-  let numbers = []
-  for (let i = 0; i < 10; i++) {
-    numbers.push(i)
-  }
-
-  console.log(display.length)
-
+  const [result, setResult] = useState(0)
+  const [equal, setEqual] = useState(false)
+ 
 
   
   let handleEqual = () => {
     setMain(result)
+    setDisplay(display.concat(' = ' + result))
     
     setPlus(false);
     setMinus(false);
     setTimes(false);
-    setDivide(false)
+    setDivide(false);
+    setEqual(true)
     
   }
-  console.log(display[display.length - 3])
+  
   const handleNumber = (number) => {
-    
-    setDisplay(display.concat(number))
+    if (equal) {
+      setMain(String(number));
+      setDisplay(String(number))
+      setEqual(false)
+    }
+    else setDisplay(display.concat(number))
+
     if (plus == false && minus == false && times == false
       && divide == false) {
-      setTotal(Number(main.concat(number)))
+      
       if (main == '0') {
         setMain(main.replace('0', number))
       }
@@ -53,142 +52,280 @@ function App() {
     else {
       if (main == '+' || main == '-' || main == 'x' || main == '/') {
         setMain(String(number));
-        setSubTotal(Number(String(number)))
+        
       }
       else {
         setMain(main.concat(number));
-        setSubTotal(Number(main.concat(number)))
+        
       }
     }
   }
 
+  let numbers = []
+  for (let i = 0; i < 10; i++) {
+    numbers.push(i)
+  }
 
-  console.log(typeof subTotal, typeof total)
-  console.log('subTotal =', subTotal, 'total =', total)
+  let padNames = ['zero', 'one', 'two', 'three', 'four', 'five',
+    'six', 'seven', 'eight', 'nine']
+
   let numbPad = () => 
     numbers.map(number => 
       <div className='grid-item number'
-      id={'no'.concat(number)}
+      id={padNames[number]}
       onClick={() => handleNumber(number)}>
         <p>{number}</p>
       </div>
       )
 
   useEffect(() => {
+    // This is the math engine. Nothing happens on display.
     let parsedDisplay = display.split(' ')
-    if (parsedDisplay[parsedDisplay.length -1] == '') {
-      parsedDisplay.pop()
-    }
-    // let operations = parsedDisplay.filter(item => ['+', '-', '/',
-    // 'x'].includes(item))
-    console.log(parsedDisplay)
-    let res
-    
-      if (parsedDisplay.includes('x') && parsedDisplay.indexOf('x') 
-      != parsedDisplay.length - 1) {
-        var indexTimes = parsedDisplay.indexOf('x')
-        res = Number(parsedDisplay[indexTimes - 1]) * Number(parsedDisplay[indexTimes + 1])
-        parsedDisplay.splice(indexTimes - 1, 3, res)
-        
-      }
-      if (parsedDisplay.includes('/') && parsedDisplay.indexOf('/')
-      != parsedDisplay.length -1) {
-        var indexDiv = parsedDisplay.indexOf('/')
-        res = Number(parsedDisplay[indexDiv - 1]) / Number(parsedDisplay[indexDiv + 1])
-        parsedDisplay.splice(indexDiv - 1, 3, res)
-      }
-      if (parsedDisplay.includes('+') && parsedDisplay.indexOf('+')
-      != parsedDisplay.length -1) {
-        var indexPlus = parsedDisplay.indexOf('+')
-        res = Number(parsedDisplay[indexPlus - 1]) + Number(parsedDisplay[indexPlus + 1])
-        parsedDisplay.splice(indexPlus - 1, 3, res)
-      }
-      if (parsedDisplay.includes('-') && parsedDisplay.indexOf('-')
-      != parsedDisplay.length -1) {
-        var indexMinus = parsedDisplay.indexOf('-')
-        res = Number(parsedDisplay[indexMinus - 1]) + Number(parsedDisplay[indexMinus + 1])
-        parsedDisplay.splice(indexMinus - 1, 3, res)
-      }
-      setResult(res)
-      
-      
-    // }
   
-  console.log('parsed results', parsedDisplay, indexTimes, indexDiv, res)
-  }, [display])
+    // Trimming the parse:
+    while (parsedDisplay.includes('')) {
+      parsedDisplay.splice(parsedDisplay.indexOf(''), 1)
+    }
+
+    console.log(parsedDisplay, 'before')
+    // if there are 2 consecutive minuses, they turn to plus:
+    for (let i = 0; i < parsedDisplay.length; i++) {
+      if (parsedDisplay[i] === '-' && parsedDisplay[i+1] === '-') {
+        parsedDisplay[i] = '+'
+        parsedDisplay.splice(i+1, 1)
+      }
+      else if (parsedDisplay[i] === '-' && parsedDisplay[i+1] === '+') {
+        parsedDisplay[i] = '-'
+        parsedDisplay.splice(i+1, 1)
+      }
+      else if (parsedDisplay[i] === '+' && parsedDisplay[i+1] === '-') {
+        parsedDisplay[i] = '-'
+        parsedDisplay.splice(i+1, 1)
+      }
+    }
+
+    // Define the 4 operations:
+    const add = () => {
+      var indexPlus = parsedDisplay.indexOf('+')
+      res = Number(parsedDisplay[indexPlus - 1]) + Number(parsedDisplay[indexPlus + 1])
+      parsedDisplay.splice(indexPlus - 1, 3, res)
+    }
+
+    const subtract = () => {
+      var indexMinus = parsedDisplay.indexOf('-')
+        res = Number(parsedDisplay[indexMinus - 1]) - Number(parsedDisplay[indexMinus + 1])
+        parsedDisplay.splice(indexMinus - 1, 3, res)
+        console.log(parsedDisplay)
+    }
+
+    const multiply = () => {
+      var indexTimes = parsedDisplay.indexOf('x')
+      res = Number(parsedDisplay[indexTimes - 1]) * Number(parsedDisplay[indexTimes + 1])
+      parsedDisplay.splice(indexTimes - 1, 3, res)
+        
+    }
+
+    const divide = () => {
+      var indexDiv = parsedDisplay.indexOf('/')
+      res = Number(parsedDisplay[indexDiv - 1]) / Number(parsedDisplay[indexDiv + 1])
+      parsedDisplay.splice(indexDiv - 1, 3, res)
+    }
     
+    // The order of operations:
+    let res
+  
+    if (parsedDisplay.includes('x') && parsedDisplay.indexOf('x')
+        != parsedDisplay.length -1) {
+         
+          if (parsedDisplay.includes('/') && parsedDisplay.indexOf('/')
+          != parsedDisplay.length -1 && parsedDisplay.indexOf('x')
+          < parsedDisplay.indexOf('/')) {
+            multiply()
+          }
+          else if (parsedDisplay.includes('/') && parsedDisplay.indexOf('/')
+          != parsedDisplay.length -1 && parsedDisplay.indexOf('x')
+          > parsedDisplay.indexOf('/')) {
+            divide()
+            console.log(parsedDisplay)
+          }
+          else if (parsedDisplay.includes('/') === false)
+            multiply()
+        }
+
+    if (parsedDisplay.includes('/') && parsedDisplay.indexOf('/')
+      != parsedDisplay.length -1) {
+      
+      if (parsedDisplay.includes('x') && parsedDisplay.indexOf('x')
+      != parsedDisplay.length -1 && parsedDisplay.indexOf('x')
+      < parsedDisplay.indexOf('/')) {
+        multiply()
+      }
+      else if (parsedDisplay.includes('x') && parsedDisplay.indexOf('x')
+      != parsedDisplay.length -1 && parsedDisplay.indexOf('x')
+      > parsedDisplay.indexOf('/')) {
+        divide()
+        console.log(parsedDisplay)
+      }
+      else if (parsedDisplay.includes('x') === false)
+        divide()
+    }
+
+  
+    while (['+', '-'].includes(parsedDisplay[1])) {
+      if (parsedDisplay[1] === '+') add()
+      else subtract()
+    }
+        
+      setResult(res)
+      // console.log(res)
+  
+  
+  }, [display])
   
   return (
     <div className='page'>
 
       <div className="App">
         {numbPad()}
-        <div className="display" id='display'>
+        <div className="display" id='display-big'>
           <div className='display1'>
             <p>{display}</p>
           </div>
           <div className='display2'>
-            <p>{main}</p>
+            <div id='display'>{main}</div>
           </div>
         </div>
         <div className="grid-item AC"
           id='clear'
           onClick={() => {
-            setSubTotal(0)
-            setTotal(0);
             setMain('0');
             setPlus(false);
             setMinus(false);
             setDivide(false);
             setTimes(false)
             setDisplay('');
+            setResult(0);
+            setEqual(false);
             }
           }>
           <p>AC</p>
         </div>
-        <div className="grid-item operator"
+        <div className="grid-item operator" id='divide'
           onClick={() => {
             
             setDivide(true);
-            setDisplay(display.concat(' / '));
+            
             setMain('/');
-          }
+            if (equal) {
+              setDisplay(String(result).concat(' / '));
+              setEqual(false);
+            }
+            else {
+              if (['+', '-', 'x'].includes(display[display.length - 2 ])) {
+                setDisplay(display.replace(display[display.length - 2 ], ' / '))
+              }
+              else {
+                if (['/'].includes(display[display.length - 2 ])) { }
+                else setDisplay(display.concat(' / '))
+              }
+            }
+            }
           }>
-            <p>/</p></div>
-        <div className="grid-item operator"
+            <p>      /          </p></div>
+        <div className="grid-item operator" id='multiply'
           onClick={() => {
          
             setTimes(true);
-            setDisplay(display.concat(' x '));
+            
             setMain('x');
-          }
-          }><p>X</p></div>
-       
-        <div className="grid-item operator"
-          onClick={() => {
-            setMain('-')
-            
-            setMinus(true);
-            setDisplay(display.concat(' - '));
-            setMain('-')
-            ;
-          }
-          }><p> -</p></div>
-        
-        <div className="grid-item operator"
-          onClick={() => {
-           
-            setPlus(true);
-            
-            setDisplay(display.concat(' + '))
-            setMain('+');
+            if (equal) {
+              setDisplay(String(result).concat(' x '));
+              setEqual(false);
             }
-          }><p>+</p></div>
+            else {
+              if (['+', '-', '/'].includes(display[display.length - 2 ])) {
+                setDisplay(display.replace(display[display.length - 2 ], ' x '))
+              }
+              else {
+                if (['x'].includes(display[display.length - 2 ])) { }
+                else setDisplay(display.concat(' x '))
+              }
+          }
+          }
+          }><p>      X       </p></div>
+       
+        <div className="grid-item operator" id='subtract'
+          onClick={() => {
+            setMinus(true);
+            
+            setMain('-')
+            if (equal) {
+              setDisplay(String(result).concat(' - '));
+              setEqual(false);
+            }
+            else {
+            
+            if (['x', '/'].includes(display[display.length - 2 ])) {
+              setDisplay(display.replace(display[display.length - 2 ], ' - '))
+            }
+            
+            else {
+              if (display[display.length - 5] == '-') { }
+              else setDisplay(display.concat(' - '))
+            }
+          }
+        }
+          
+          }><p>   -    </p></div>
         
-        <div className="grid-item equal"
+        <div className="grid-item operator" id='add'
+          onClick={() => {
+            setPlus(true);
+
+            setMain('+');
+            if (equal) {
+              setDisplay(String(result).concat(' + '));
+              setEqual(false);
+            }
+            else {
+              if (['x', '/'].includes(display[display.length - 2 ])) {
+                setDisplay(display.replace(display[display.length - 2 ], ' + '))
+              }
+              else {
+                if (['+'].includes(display[display.length - 2 ])) { }
+                else setDisplay(display.concat(' + '))
+              }
+            }
+            }
+          }><p>    +      </p></div>
+        
+        <div className="grid-item equal" id='equals'
           onClick={() => handleEqual()
-          }><p>=</p></div>
-        <div className="grid-item number"><p>.</p></div>
+          }><p>    =     </p>
+        </div>
+
+
+        <div className="grid-item number" id='decimal'
+          onClick={() => {
+            
+            
+            if (equal) {
+              setDisplay(String(main).concat('.'))
+              setEqual(false);
+            }
+            else {
+              for (let i = 0; i < display.length; i++) {
+                console.log('index', i, 'value in array:', display[i], display.length)
+              }
+              
+                if (['.'].includes(display[display.length - 1 ])) { }
+                else {
+                  setDisplay(display.concat('.'));
+                  setMain(String(main).concat('.'))}
+              
+            }
+            
+          }}><p>.</p></div>
           
       </div>
       
