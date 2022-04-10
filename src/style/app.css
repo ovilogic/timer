@@ -41,16 +41,12 @@
         font-family: Helvetica;
     }
 
-    .display {
+    .display-big {
         grid-column-start: 1;
         grid-column-end: 5;
-        background-color: black;
-        font-family: Arial, Helvetica, sans-serif;
-      
-            
-    }
-
-        #display-big {
+        background-color: rgb(80, 80, 53);
+        font-family: Arial, Helvetica, sans-serif;  
+   
             display: flex;
             flex-direction: column;
             height: 80px;
@@ -65,7 +61,6 @@
         }
 
         .display1 p {
-            
             font-size: 34px;
             position: absolute;
             right: 0px;
@@ -74,6 +69,7 @@
             height: 100%;
             padding-top: 0px;
             color: coral;
+            overflow: hidden;
             
         }
 
