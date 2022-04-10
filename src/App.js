@@ -192,7 +192,7 @@ function App() {
       }
     }
     
-    while (['+', '-'].includes(parsedDisplay[1])) {
+    while (['+', '-'].includes(parsedDisplay[1]) && parsedDisplay[1] != '=') {
       if (parsedDisplay[1] === '+') add()
       else subtract()
     }
@@ -203,9 +203,9 @@ function App() {
         res = r
     }
     }
-    
+    res = String(res)
     setResult(res)
-    console.log('at the end result', res)
+    console.log('at the end result', res, parsedDisplay)
   }, [display])
   
   return (
@@ -288,8 +288,12 @@ function App() {
               setEqual(false);
             }
             else {
+              for (let i = 0; i < display.length; i++) {
+                console.log(i, ':', display[i])
+              }
             
               if (display[display.length - 5] == '-') { }
+              else if (display[display.length - 2] == '-' && display[display.length - 5] == '*') { }
               else setDisplay(display.concat(' - '))
             
           }
@@ -311,6 +315,7 @@ function App() {
               }
               else {
                 if (['+'].includes(display[display.length - 2 ])) { }
+                else if (display[display.length - 2] == '-' && display[display.length - 5] == '*') { setDisplay(display.replace(display[display.length - 2 ], ''))}
                 else setDisplay(display.concat(' + '))
               }
             }
