@@ -4,7 +4,7 @@ import './style/app.css'
 
 function App() {
 
-  const [main, setMain] = useState('0')
+  const [main, setMain] = useState(0)
   const [plus, setPlus] = useState(false)
   const [minus, setMinus] = useState(false)
   const [times, setTimes] = useState(false)
@@ -48,7 +48,7 @@ function App() {
   
       if (plus == false && minus == false && times == false
         && divide == false) {
-        if (main == '0') {
+        if (main == 0) {
           setMain(main.replace('0', number))
         }
         else {
@@ -116,6 +116,11 @@ function App() {
       else if (parsedDisplay[i] === '*' && parsedDisplay[i+1] === '-') {
         parsedDisplay[i+2] = '-'.concat(parsedDisplay[i+2])
         parsedDisplay.splice(i+1, 1)
+      }
+
+      else if (parsedDisplay[0] === '-') {
+        parsedDisplay[1] = '-'.concat(parsedDisplay[1])
+        parsedDisplay.splice(0, 1)
       }
      
     }
@@ -293,6 +298,7 @@ function App() {
               }
             
               if (display[display.length - 5] == '-') { }
+              
               else if (display[display.length - 2] == '-' && display[display.length - 5] == '*') { }
               else setDisplay(display.concat(' - '))
             
