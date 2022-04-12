@@ -1,0 +1,19 @@
+* {
+    color: rgb(1, 1, 73);
+}
+
+h1 {
+    text-align: center;
+}
+
+.break, .session {
+    display: inline-block;
+    margin: 5px 20px;
+}
+
+.display {
+    display: flex;
+    flex-direction: column;
+    
+}
+

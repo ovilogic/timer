@@ -1,0 +1,13 @@
+* {
+    box-sizing: border-box;
+    outline: 1px dotted orange;
+}
+
+body {
+    
+    background-color: grey;
+    display: flex;
+        justify-content: center;
+        align-items: center;
+    flex-direction: column;
+}
